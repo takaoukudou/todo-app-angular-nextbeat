@@ -1,0 +1,7 @@
+<div *ngIf="todo">
+  <div><h3>{{todo.title}}</h3></div>
+  <div>{{todo.body}}</div>
+  <div>ステータス：{{todo.stateStr}}</div>
+  <div>カテゴリ：{{todo.categoryStr}}</div>
+  <div>カラー：{{todo.color | colorPipe}}</div>
+</div>
