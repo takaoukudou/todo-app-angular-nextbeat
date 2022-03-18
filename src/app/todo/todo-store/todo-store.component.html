@@ -1,41 +1,37 @@
-<form [formGroup]="todoForm" (ngSubmit)="onSubmit()">
-  <dl>
-    <dt>
-      タイトル
-    </dt>
-    <dd>
-      <input formControlName="title">
-      <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
-        <div *ngIf="titleForm.errors?.['required']">
-          タイトルが入力されていません。
+<div class="app-component">
+  <form [formGroup]="todoForm" (ngSubmit)="onSubmit()">
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>タイトル</mat-label>
+        <input matInput formControlName="title">
+        <div *ngIf="titleForm.invalid && (titleForm.dirty || titleForm.touched)">
+          <div *ngIf="titleForm.errors?.['required']">
+            タイトルが入力されていません。
+          </div>
         </div>
-      </div>
-    </dd>
-  </dl>
-  <dl>
-    <dt>
-      本文
-    </dt>
-    <dd>
-      <input formControlName="body">
-      <div *ngIf="bodyForm.invalid && (bodyForm.dirty || bodyForm.touched)">
-        <div *ngIf="bodyForm.errors?.['required']">
-          本文が入力されていません。
+      </mat-form-field>
+    </dl>
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>本文</mat-label>
+        <input matInput formControlName="body">
+        <div *ngIf="bodyForm.invalid && (bodyForm.dirty || bodyForm.touched)">
+          <div *ngIf="bodyForm.errors?.['required']">
+            本文が入力されていません。
+          </div>
         </div>
-      </div>
-    </dd>
-  </dl>
-  <dl>
-    <dt>
-      カテゴリ
-    </dt>
-    <dd>
-      <select formControlName="categoryId">
-        <option *ngFor="let category of categoryList" [value]="category.id">
-          {{ category.name }}
-        </option>
-      </select>
-    </dd>
-  </dl>
-  <button type="submit" [disabled]="!todoForm.valid">登録</button>
-</form>
+      </mat-form-field>
+    </dl>
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリ</mat-label>
+        <mat-select formControlName="categoryId">
+          <mat-option *ngFor="let category of categoryList" [value]="category.id">
+            {{ category.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </dl>
+    <button type="submit" [disabled]="!todoForm.valid">登録</button>
+  </form>
+</div>

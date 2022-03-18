@@ -1,7 +1,7 @@
-<div *ngIf="todo">
-  <div><h3>{{todo.title}}</h3></div>
-  <div>{{todo.body}}</div>
+<mat-card id="todo-item" *ngIf="todo">
+  <mat-card-title><h3>{{todo.title}}</h3></mat-card-title>
+  <mat-card-subtitle>{{todo.body}}</mat-card-subtitle>
   <div>ステータス：{{todo.stateStr}}</div>
   <div>カテゴリ：{{todo.categoryStr}}</div>
   <div>カラー：{{todo.color | colorPipe}}</div>
-</div>
+</mat-card>

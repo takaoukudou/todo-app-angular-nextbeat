@@ -6,6 +6,10 @@ import { TodoEditComponent } from './todo-edit/todo-edit.component';
 import { TodoStoreComponent } from './todo-store/todo-store.component';
 import { ColorPipe } from '../util/color.pipe';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -15,6 +19,13 @@ import { ReactiveFormsModule } from '@angular/forms';
     TodoStoreComponent,
     ColorPipe,
   ],
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCardModule,
+  ],
 })
 export class TodoModule {}
