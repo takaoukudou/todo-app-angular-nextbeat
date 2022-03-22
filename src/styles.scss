@@ -12,3 +12,35 @@ body {
 .app-component {
   padding: 10px 30px;
 }
+
+.boxContainer {
+  display: flex;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.list-item {
+  margin: 0 auto;
+}
+
+.category-red {
+  background-color: #e60012;
+}
+
+.category-blue {
+  background-color: #009bbf;
+}
+
+.category-green {
+  background-color: #009944;
+}
+
+.category-yellow {
+  background-color: #d7c447;
+}
+
+.category-pink {
+  background-color: #e85298;
+}

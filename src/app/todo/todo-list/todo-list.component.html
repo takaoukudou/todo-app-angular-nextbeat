@@ -1,5 +1,5 @@
 <div class="app-component">
   <div *ngFor="let todo of todoList">
-    <app-todo-item [todo]="todo"></app-todo-item>
+    <app-todo-item [todo]="todo" (event)="refresh()" class="list-item"></app-todo-item>
   </div>
 </div>

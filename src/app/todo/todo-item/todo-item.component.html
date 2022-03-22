@@ -1,7 +1,15 @@
 <mat-card id="todo-item" *ngIf="todo">
-  <mat-card-title><h3>{{todo.title}}</h3></mat-card-title>
+  <div class="boxContainer">
+    <mat-card-title class="box">{{todo.title}}</mat-card-title>
+    <mat-icon (click)="edit(todo.id)" class="box pointer edit">edit</mat-icon>
+    <mat-icon (click)="delete(todo.id)" class="box pointer delete">delete</mat-icon>
+  </div>
   <mat-card-subtitle>{{todo.body}}</mat-card-subtitle>
-  <div>ステータス：{{todo.stateStr}}</div>
-  <div>カテゴリ：{{todo.categoryStr}}</div>
-  <div>カラー：{{todo.color | colorPipe}}</div>
+
+  <div class="boxContainer">
+    <div>ステータス：{{todo.stateStr}}</div>
+    <mat-card class="category" [ngClass]="categoryColor">
+      <div>{{todo.categoryStr}}</div>
+    </mat-card>
+  </div>
 </mat-card>
