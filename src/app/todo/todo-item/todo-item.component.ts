@@ -54,11 +54,7 @@ export class TodoItemComponent implements OnInit {
 
   delete(id: number) {
     this.http
-      .post(
-        'http://localhost:9000/todo/delete',
-        { id: this.todo?.id },
-        this.httpOptions
-      )
+      .delete('http://localhost:9000/todos/' + this.todo?.id)
       .pipe(
         tap(() => console.log('delete todo')),
         catchError(handleError('delete'))

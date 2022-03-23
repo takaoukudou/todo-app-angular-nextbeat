@@ -1,5 +1,5 @@
 <div class="app-component">
-  <form [formGroup]="todoForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="todoForm" *ngIf="todoForm" (ngSubmit)="onSubmit()">
     <dl>
       <mat-form-field appearance="fill">
         <mat-label>タイトル</mat-label>

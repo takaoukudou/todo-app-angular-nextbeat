@@ -29,7 +29,7 @@ export class TodoListComponent implements OnInit {
   getTodoList(): void {
     this.loadingService.show();
     this.http
-      .get<Todo[]>('http://localhost:9000/todo/list')
+      .get<Todo[]>('http://localhost:9000/todos')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Todo[]>('getTodoList', []))

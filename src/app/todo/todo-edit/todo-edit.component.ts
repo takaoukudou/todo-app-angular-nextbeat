@@ -14,7 +14,7 @@ import { LoadingService } from '../../loading/loading.service';
   styleUrls: ['./todo-edit.component.scss'],
 })
 export class TodoEditComponent implements OnInit {
-  todoForm: FormGroup;
+  todoForm!: FormGroup;
   todo: Todo | undefined;
   todoId: number;
   categoryList: Category[] = [];
@@ -33,23 +33,18 @@ export class TodoEditComponent implements OnInit {
     private route: ActivatedRoute,
     private loadingService: LoadingService
   ) {
-    this.todoForm = new FormGroup({
-      title: new FormControl('', Validators.required),
-      body: new FormControl('', Validators.required),
-      categoryId: new FormControl('', Validators.required),
-      state: new FormControl('', Validators.required),
-    });
     this.todoId = route.snapshot.params['id'];
   }
 
   ngOnInit(): void {
     this.getCategoryList();
+    this.getTodo();
   }
 
   getCategoryList(): void {
     this.loadingService.show();
     this.http
-      .get<Category[]>('http://localhost:9000/category/list')
+      .get<Category[]>('http://localhost:9000/categories')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Category[]>('getCategoryList', []))
@@ -60,11 +55,47 @@ export class TodoEditComponent implements OnInit {
       });
   }
 
+  getTodo(): void {
+    this.loadingService.show();
+    this.http
+      .get<Todo>('http://localhost:9000/todos/' + this.todoId)
+      .pipe(
+        tap((todo) => console.log('fetched todo')),
+        catchError(handleError<Todo>('getTodo', undefined))
+      )
+      .subscribe((todo) => {
+        this.todo = todo;
+        this.setForm();
+        this.loadingService.hide();
+      });
+  }
+
+  setForm(): void {
+    const targetCategory = this.categoryList.find(
+      (c) => c.name == this.todo?.categoryStr
+    );
+    const targetState = this.stateList.find(
+      (s) => s.name == this.todo?.stateStr
+    );
+    this.todoForm = new FormGroup({
+      title: new FormControl(this.todo?.title, Validators.required),
+      body: new FormControl(this.todo?.body, Validators.required),
+      categoryId: new FormControl(
+        targetCategory !== undefined ? targetCategory.id : 0,
+        Validators.required
+      ),
+      state: new FormControl(
+        targetState !== undefined ? targetState.code : -1,
+        Validators.required
+      ),
+    });
+  }
+
   onSubmit(): void {
     this.loadingService.show();
     this.http
-      .post(
-        'http://localhost:9000/todo/' + this.todoId + '/update',
+      .put(
+        'http://localhost:9000/todos/' + this.todoId,
         this.todoForm.value,
         this.httpOptions
       )

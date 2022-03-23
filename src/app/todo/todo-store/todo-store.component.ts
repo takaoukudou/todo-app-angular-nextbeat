@@ -38,7 +38,7 @@ export class TodoStoreComponent implements OnInit {
   getCategoryList(): void {
     this.loadingService.show();
     this.http
-      .get<Category[]>('http://localhost:9000/category/list')
+      .get<Category[]>('http://localhost:9000/categories')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Category[]>('getCategoryList', []))
@@ -52,7 +52,7 @@ export class TodoStoreComponent implements OnInit {
   onSubmit(): void {
     this.http
       .post(
-        'http://localhost:9000/todo/store',
+        'http://localhost:9000/todos',
         this.todoForm.value,
         this.httpOptions
       )
