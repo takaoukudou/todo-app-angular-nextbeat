@@ -25,6 +25,21 @@ body {
   margin: 0 auto;
 }
 
+.item {
+  margin: 20px auto;
+  padding: 20px;
+  width: 700px;
+}
+
+.category-item, .category-item > .mat-card-subtitle {
+  color: floralwhite;
+}
+
+.edit {
+  margin-right: 15px;
+  margin-left: auto;
+}
+
 .category-red {
   background-color: #e60012;
 }
@@ -44,3 +59,8 @@ body {
 .category-pink {
   background-color: #e85298;
 }
+
+.category-undefined {
+  background-color: black;
+}
+

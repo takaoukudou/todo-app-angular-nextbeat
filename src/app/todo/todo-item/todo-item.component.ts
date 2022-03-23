@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { handleError } from '../../util/handle-error';
+import { LoadingService } from '../../loading/loading.service';
 
 @Component({
   selector: 'app-todo-item',
@@ -45,7 +46,9 @@ export class TodoItemComponent implements OnInit {
         ? 'category-green'
         : this.todo?.color === 4
         ? 'category-yellow'
-        : 'category-pink';
+        : this.todo?.color === 5
+        ? 'category-pink'
+        : 'category-undefined';
   }
 
   edit(id: number) {
