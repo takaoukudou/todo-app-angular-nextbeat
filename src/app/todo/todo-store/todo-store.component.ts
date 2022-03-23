@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { handleError } from '../../util/handle-error';
+import { LoadingService } from '../../loading/loading.service';
 
 @Component({
   selector: 'app-todo-store',
@@ -18,7 +19,11 @@ export class TodoStoreComponent implements OnInit {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private loadingService: LoadingService
+  ) {
     this.todoForm = new FormGroup({
       title: new FormControl('', Validators.required),
       body: new FormControl('', Validators.required),
@@ -31,13 +36,17 @@ export class TodoStoreComponent implements OnInit {
   }
 
   getCategoryList(): void {
+    this.loadingService.show();
     this.http
       .get<Category[]>('http://localhost:9000/category/list')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Category[]>('getCategoryList', []))
       )
-      .subscribe((categoryList) => (this.categoryList = categoryList));
+      .subscribe((categoryList) => {
+        this.categoryList = categoryList;
+        this.loadingService.hide();
+      });
   }
 
   onSubmit(): void {

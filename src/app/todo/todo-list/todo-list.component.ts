@@ -3,6 +3,7 @@ import { Todo } from '../../models/Todo';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
 import { handleError } from '../../util/handle-error';
+import { LoadingService } from '../../loading/loading.service';
 
 @Component({
   selector: 'app-todo-list',
@@ -12,7 +13,10 @@ import { handleError } from '../../util/handle-error';
 export class TodoListComponent implements OnInit {
   todoList: Todo[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private loadingService: LoadingService
+  ) {}
 
   ngOnInit(): void {
     this.getTodoList();
@@ -23,12 +27,16 @@ export class TodoListComponent implements OnInit {
   }
 
   getTodoList(): void {
+    this.loadingService.show();
     this.http
       .get<Todo[]>('http://localhost:9000/todo/list')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Todo[]>('getTodoList', []))
       )
-      .subscribe((todoList) => (this.todoList = todoList));
+      .subscribe((todoList) => {
+        this.todoList = todoList;
+        this.loadingService.hide();
+      });
   }
 }

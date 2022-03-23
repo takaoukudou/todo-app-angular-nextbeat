@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, tap } from 'rxjs/operators';
 import { handleError } from '../../util/handle-error';
 import { Todo } from '../../models/Todo';
+import { LoadingService } from '../../loading/loading.service';
 
 @Component({
   selector: 'app-todo-edit',
@@ -29,7 +30,8 @@ export class TodoEditComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private loadingService: LoadingService
   ) {
     this.todoForm = new FormGroup({
       title: new FormControl('', Validators.required),
@@ -45,16 +47,21 @@ export class TodoEditComponent implements OnInit {
   }
 
   getCategoryList(): void {
+    this.loadingService.show();
     this.http
       .get<Category[]>('http://localhost:9000/category/list')
       .pipe(
         tap((todos) => console.log('fetched todos')),
         catchError(handleError<Category[]>('getCategoryList', []))
       )
-      .subscribe((categoryList) => (this.categoryList = categoryList));
+      .subscribe((categoryList) => {
+        this.categoryList = categoryList;
+        this.loadingService.hide();
+      });
   }
 
   onSubmit(): void {
+    this.loadingService.show();
     this.http
       .post(
         'http://localhost:9000/todo/' + this.todoId + '/update',
