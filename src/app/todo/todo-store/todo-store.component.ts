@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Category } from '../../models/Category';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { handleError } from '../../util/handle-error';
 import { LoadingService } from '../../loading/loading.service';
+import { CategoryService } from '../../category/category.service';
+import { TodoService } from '../todo.service';
 
 @Component({
   selector: 'app-todo-store',
@@ -15,14 +14,12 @@ import { LoadingService } from '../../loading/loading.service';
 export class TodoStoreComponent implements OnInit {
   todoForm: FormGroup;
   categoryList: Category[] = [];
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
 
   constructor(
-    private http: HttpClient,
     private router: Router,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private categoryService: CategoryService,
+    private todoService: TodoService
   ) {
     this.todoForm = new FormGroup({
       title: new FormControl('', Validators.required),
@@ -37,29 +34,15 @@ export class TodoStoreComponent implements OnInit {
 
   getCategoryList(): void {
     this.loadingService.show();
-    this.http
-      .get<Category[]>('http://localhost:9000/categories')
-      .pipe(
-        tap((todos) => console.log('fetched todos')),
-        catchError(handleError<Category[]>('getCategoryList', []))
-      )
-      .subscribe((categoryList) => {
-        this.categoryList = categoryList;
-        this.loadingService.hide();
-      });
+    this.categoryService.getCategoryList().subscribe((categoryList) => {
+      this.categoryList = categoryList;
+      this.loadingService.hide();
+    });
   }
 
   onSubmit(): void {
-    this.http
-      .post(
-        'http://localhost:9000/todos',
-        this.todoForm.value,
-        this.httpOptions
-      )
-      .pipe(
-        tap((res) => console.log(res)),
-        catchError(handleError('onSubmit'))
-      )
+    this.todoService
+      .add(this.todoForm.value)
       .subscribe((_) => this.router.navigateByUrl('/todo/list'));
   }
 

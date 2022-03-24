@@ -1,16 +1,7 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  ChangeDetectorRef,
-  EventEmitter,
-  Output,
-} from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { Todo } from '../../models/Todo';
 import { Router } from '@angular/router';
-import { catchError, tap } from 'rxjs/operators';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { handleError } from '../../util/handle-error';
+import { TodoService } from '../todo.service';
 
 @Component({
   selector: 'app-todo-item',
@@ -21,15 +12,8 @@ export class TodoItemComponent implements OnInit {
   @Input() todo: Todo | undefined;
   @Output() event = new EventEmitter<String>();
   categoryColor: string = '';
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    public changeDetectorRef: ChangeDetectorRef
-  ) {
+  constructor(private router: Router, private todoService: TodoService) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
@@ -53,12 +37,6 @@ export class TodoItemComponent implements OnInit {
   }
 
   delete(id: number) {
-    this.http
-      .delete('http://localhost:9000/todos/' + this.todo?.id)
-      .pipe(
-        tap(() => console.log('delete todo')),
-        catchError(handleError('delete'))
-      )
-      .subscribe((_) => this.event.emit());
+    this.todoService.delete(id).subscribe((_) => this.event.emit());
   }
 }
