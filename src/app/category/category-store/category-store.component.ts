@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, tap } from 'rxjs/operators';
-import { handleError } from '../../util/handle-error';
 import { colorList } from '../../util/color-list';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-category-store',
@@ -15,11 +14,11 @@ export class CategoryStoreComponent implements OnInit {
   categoryForm: FormGroup;
   colorList = colorList;
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
-
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private categoryService: CategoryService
+  ) {
     this.categoryForm = new FormGroup({
       name: new FormControl('', Validators.required),
       slug: new FormControl('', [
@@ -33,16 +32,8 @@ export class CategoryStoreComponent implements OnInit {
   ngOnInit(): void {}
 
   onSubmit(): void {
-    this.http
-      .post(
-        'http://localhost:9000/category/store',
-        this.categoryForm.value,
-        this.httpOptions
-      )
-      .pipe(
-        tap((res) => console.log(res)),
-        catchError(handleError('onSubmit'))
-      )
+    this.categoryService
+      .add(this.categoryForm.value)
       .subscribe((_) => this.router.navigateByUrl('/category/list'));
   }
 

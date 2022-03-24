@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingService } from '../../loading/loading.service';
-import { catchError, tap } from 'rxjs/operators';
-import { handleError } from '../../util/handle-error';
 import { Category } from '../../models/Category';
 import { colorList } from '../../util/color-list';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-category-edit',
@@ -18,35 +17,28 @@ export class CategoryEditComponent implements OnInit {
   categoryId: number;
   category: Category | undefined;
   colorList = colorList;
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private categoryService: CategoryService
   ) {
     this.categoryId = route.snapshot.params['id'];
+  }
+
+  ngOnInit(): void {
     this.getCategory();
   }
 
-  ngOnInit(): void {}
-
   getCategory(): void {
     this.loadingService.show();
-    this.http
-      .get<Category>('http://localhost:9000/category/' + this.categoryId)
-      .pipe(
-        tap((category) => console.log('fetched category')),
-        catchError(handleError<Category>('getCategory', undefined))
-      )
-      .subscribe((category) => {
-        this.category = category;
-        this.setForm();
-        this.loadingService.hide();
-      });
+    this.categoryService.getCategory(this.categoryId).subscribe((category) => {
+      this.category = category;
+      this.setForm();
+      this.loadingService.hide();
+    });
   }
 
   setForm(): void {
@@ -61,17 +53,8 @@ export class CategoryEditComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.loadingService.show();
-    this.http
-      .post(
-        'http://localhost:9000/category/' + this.categoryId + '/update',
-        this.categoryForm.value,
-        this.httpOptions
-      )
-      .pipe(
-        tap(() => console.log('update todo')),
-        catchError(handleError('onSubmit'))
-      )
+    this.categoryService
+      .update(this.categoryId, this.categoryForm.value)
       .subscribe((_) => this.router.navigateByUrl('/category/list'));
   }
 

@@ -5,6 +5,7 @@ import { handleError } from '../../util/handle-error';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LoadingService } from '../../loading/loading.service';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-category-list',
@@ -17,7 +18,8 @@ export class CategoryListComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit(): void {
@@ -30,15 +32,9 @@ export class CategoryListComponent implements OnInit {
 
   getCategoryList(): void {
     this.loadingService.show();
-    this.http
-      .get<Category[]>('http://localhost:9000/category/list')
-      .pipe(
-        tap((todos) => console.log('fetched todos')),
-        catchError(handleError<Category[]>('getCategoryList', []))
-      )
-      .subscribe((categoryList) => {
-        this.categoryList = categoryList;
-        this.loadingService.hide();
-      });
+    this.categoryService.getCategoryList().subscribe((categoryList) => {
+      this.categoryList = categoryList;
+      this.loadingService.hide();
+    });
   }
 }

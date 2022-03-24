@@ -1,5 +1,5 @@
 <div class="app-component">
-  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="categoryForm" *ngIf="categoryForm" (ngSubmit)="onSubmit()">
     <dl>
       <mat-form-field appearance="fill">
         <mat-label>カテゴリ名</mat-label>

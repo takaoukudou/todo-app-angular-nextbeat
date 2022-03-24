@@ -6,11 +6,10 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Category } from '../../models/Category';
-import { catchError, tap } from 'rxjs/operators';
-import { handleError } from '../../util/handle-error';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-category-item',
@@ -21,14 +20,12 @@ export class CategoryItemComponent implements OnInit {
   @Input() category: Category | undefined;
   @Output() event = new EventEmitter<String>();
   categoryColor: string = '';
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    public changeDetectorRef: ChangeDetectorRef
+    public changeDetectorRef: ChangeDetectorRef,
+    private categoryService: CategoryService
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
@@ -53,16 +50,6 @@ export class CategoryItemComponent implements OnInit {
   }
 
   delete(id: number) {
-    this.http
-      .post(
-        'http://localhost:9000/category/delete',
-        { id: this.category?.id },
-        this.httpOptions
-      )
-      .pipe(
-        tap(() => console.log('delete todo')),
-        catchError(handleError('delete'))
-      )
-      .subscribe((_) => this.event.emit());
+    this.categoryService.delete(id).subscribe((_) => this.event.emit());
   }
 }
