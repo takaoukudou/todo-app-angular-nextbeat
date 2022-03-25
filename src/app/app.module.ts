@@ -13,6 +13,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingComponent } from './loading/loading.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { TodoState } from './todo/store/todo.state';
+import { CategoryState } from './category/store/category.state';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, LoadingComponent],
@@ -27,6 +31,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatToolbarModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    NgxsModule.forRoot([TodoState, CategoryState]),
+    NgxsLoggerPluginModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

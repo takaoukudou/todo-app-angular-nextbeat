@@ -26,7 +26,7 @@
       <mat-form-field appearance="fill">
         <mat-label>カテゴリ</mat-label>
         <mat-select formControlName="categoryId">
-          <mat-option *ngFor="let category of categoryList" [value]="category.id">
+          <mat-option *ngFor="let category of categoryList$ | async" [value]="category.id">
             {{ category.name }}
           </mat-option>
         </mat-select>

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Todo } from '../models/Todo';
+import { Todo } from '../models/todo';
 import { catchError, tap } from 'rxjs/operators';
 import { handleError } from '../util/handle-error';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { EditTodoFormValue, StoreTodoFormValue } from '../models/todo-form';
+import { OnlyId } from '../models/onlyId';
 
 @Injectable({
   providedIn: 'root',
@@ -30,26 +32,28 @@ export class TodoService {
     );
   }
 
-  add(todoFormValue: any): Observable<any> {
-    return this.http.post(this.baseUrl, todoFormValue, this.httpOptions).pipe(
-      tap(() => console.log('add todo')),
-      catchError(handleError('addTodo'))
-    );
-  }
-
-  update(id: number, todoFormValue: any): Observable<any> {
+  add(todoFormValue: StoreTodoFormValue): Observable<Todo> {
     return this.http
-      .put(`${this.baseUrl}/${id}`, todoFormValue, this.httpOptions)
+      .post<Todo>(this.baseUrl, todoFormValue, this.httpOptions)
       .pipe(
-        tap(() => console.log('update todo')),
-        catchError(handleError('updateTodo'))
+        tap((todo) => console.log('add todo')),
+        catchError(handleError<Todo>('addTodo'))
       );
   }
 
-  delete(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+  update(id: number, todoFormValue: EditTodoFormValue): Observable<Todo> {
+    return this.http
+      .put<Todo>(`${this.baseUrl}/${id}`, todoFormValue, this.httpOptions)
+      .pipe(
+        tap(() => console.log('update todo')),
+        catchError(handleError<Todo>('updateTodo'))
+      );
+  }
+
+  delete(id: number): Observable<OnlyId> {
+    return this.http.delete<OnlyId>(`${this.baseUrl}/${id}`).pipe(
       tap(() => console.log('delete todo')),
-      catchError(handleError('delete'))
+      catchError(handleError<OnlyId>('delete'))
     );
   }
 }

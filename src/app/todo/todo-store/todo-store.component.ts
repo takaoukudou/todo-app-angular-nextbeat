@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Category } from '../../models/Category';
+import { Category } from '../../models/category';
 import { Router } from '@angular/router';
 import { LoadingService } from '../../loading/loading.service';
-import { CategoryService } from '../../category/category.service';
-import { TodoService } from '../todo.service';
+import { TodoAction } from '../store/todo.actions';
+import AddTodo = TodoAction.AddTodo;
+import { Select, Store } from '@ngxs/store';
+import { CategoryAction } from '../../category/store/category.actions';
+import GetCategories = CategoryAction.GetCategories;
+import { CategoryState } from '../../category/store/category.state';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-todo-store',
@@ -13,13 +18,12 @@ import { TodoService } from '../todo.service';
 })
 export class TodoStoreComponent implements OnInit {
   todoForm: FormGroup;
-  categoryList: Category[] = [];
+  @Select(CategoryState.categories) categoryList$!: Observable<Category[]>;
 
   constructor(
     private router: Router,
     private loadingService: LoadingService,
-    private categoryService: CategoryService,
-    private todoService: TodoService
+    private store: Store
   ) {
     this.todoForm = new FormGroup({
       title: new FormControl('', Validators.required),
@@ -34,16 +38,14 @@ export class TodoStoreComponent implements OnInit {
 
   getCategoryList(): void {
     this.loadingService.show();
-    this.categoryService.getCategoryList().subscribe((categoryList) => {
-      this.categoryList = categoryList;
-      this.loadingService.hide();
-    });
+    this.store.dispatch(new GetCategories());
+    this.loadingService.hide();
   }
 
   onSubmit(): void {
-    this.todoService
-      .add(this.todoForm.value)
-      .subscribe((_) => this.router.navigateByUrl('/todo/list'));
+    this.store
+      .dispatch(new AddTodo(this.todoForm.value))
+      .subscribe(() => this.router.navigateByUrl('/todo/list'));
   }
 
   get titleForm() {
