@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Todo } from '../../models/Todo';
+import { Todo } from '../../models/todo';
 import { LoadingService } from '../../loading/loading.service';
 import { TodoService } from '../todo.service';
+import { Select, Store } from '@ngxs/store';
+import { TodoState } from '../store/todo.state';
+import { Observable } from 'rxjs';
+import { TodoAction } from '../store/todo.actions';
+import GetTodos = TodoAction.GetTodos;
 
 @Component({
   selector: 'app-todo-list',
@@ -9,11 +14,12 @@ import { TodoService } from '../todo.service';
   styleUrls: ['./todo-list.component.scss'],
 })
 export class TodoListComponent implements OnInit {
-  todoList: Todo[] = [];
+  @Select(TodoState.todos) todoList$!: Observable<Todo[]>;
 
   constructor(
     private loadingService: LoadingService,
-    private todoService: TodoService
+    private todoService: TodoService,
+    private store: Store
   ) {}
 
   ngOnInit(): void {
@@ -26,9 +32,7 @@ export class TodoListComponent implements OnInit {
 
   getTodoList(): void {
     this.loadingService.show();
-    this.todoService.getTodoList().subscribe((todoList) => {
-      this.todoList = todoList;
-      this.loadingService.hide();
-    });
+    this.store.dispatch(new GetTodos());
+    this.loadingService.hide();
   }
 }

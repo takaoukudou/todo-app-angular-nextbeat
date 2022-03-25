@@ -1,11 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Category } from '../../models/Category';
+import { Category } from '../../models/category';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Todo } from '../../models/Todo';
+import { Todo } from '../../models/todo';
 import { LoadingService } from '../../loading/loading.service';
-import { CategoryService } from '../../category/category.service';
-import { TodoService } from '../todo.service';
+import { Select, Store } from '@ngxs/store';
+import { TodoState } from '../store/todo.state';
+import { Observable } from 'rxjs';
+import { TodoAction } from '../store/todo.actions';
+import GetTodo = TodoAction.GetTodo;
+import UpdateTodo = TodoAction.UpdateTodo;
+import { CategoryAction } from '../../category/store/category.actions';
+import GetCategories = CategoryAction.GetCategories;
+import { CategoryState } from '../../category/store/category.state';
 
 @Component({
   selector: 'app-todo-edit',
@@ -14,9 +21,9 @@ import { TodoService } from '../todo.service';
 })
 export class TodoEditComponent implements OnInit {
   todoForm!: FormGroup;
-  todo: Todo | undefined;
+  @Select(TodoState.selectedTodos) todo$!: Observable<Todo>;
   todoId: number;
-  categoryList: Category[] = [];
+  @Select(CategoryState.categories) categoryList$!: Observable<Category[]>;
   stateList = [
     { code: 0, name: 'TODO(着手前)' },
     { code: 1, name: '進行中' },
@@ -27,8 +34,7 @@ export class TodoEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private loadingService: LoadingService,
-    private categoryService: CategoryService,
-    private todoService: TodoService
+    private store: Store
   ) {
     this.todoId = route.snapshot.params['id'];
   }
@@ -40,47 +46,45 @@ export class TodoEditComponent implements OnInit {
 
   getCategoryList(): void {
     this.loadingService.show();
-    this.categoryService.getCategoryList().subscribe((categoryList) => {
-      this.categoryList = categoryList;
-      this.loadingService.hide();
-    });
+    this.store.dispatch(new GetCategories());
+    this.loadingService.hide();
   }
 
   getTodo(): void {
     this.loadingService.show();
-    this.todoService.getTodo(this.todoId).subscribe((todo) => {
-      this.todo = todo;
+    this.store.dispatch(new GetTodo(this.todoId)).subscribe(() => {
       this.setForm();
       this.loadingService.hide();
     });
   }
 
   setForm(): void {
-    const targetCategory = this.categoryList.find(
-      (c) => c.name == this.todo?.categoryStr
-    );
-    const targetState = this.stateList.find(
-      (s) => s.name == this.todo?.stateStr
-    );
-    this.todoForm = new FormGroup({
-      title: new FormControl(this.todo?.title, Validators.required),
-      body: new FormControl(this.todo?.body, Validators.required),
-      categoryId: new FormControl(
-        targetCategory !== undefined ? targetCategory.id : 0,
-        Validators.required
-      ),
-      state: new FormControl(
-        targetState !== undefined ? targetState.code : -1,
-        Validators.required
-      ),
+    this.todo$.subscribe((todo) => {
+      this.categoryList$.subscribe((categoryList) => {
+        const targetCategory = categoryList.find(
+          (c) => c.name == todo.categoryStr
+        );
+        const targetState = this.stateList.find((s) => s.name == todo.stateStr);
+        this.todoForm = new FormGroup({
+          title: new FormControl(todo.title, Validators.required),
+          body: new FormControl(todo.body, Validators.required),
+          categoryId: new FormControl(
+            targetCategory !== undefined ? targetCategory.id : 0,
+            Validators.required
+          ),
+          state: new FormControl(
+            targetState !== undefined ? targetState.code : -1,
+            Validators.required
+          ),
+        });
+      });
     });
   }
 
   onSubmit(): void {
-    this.loadingService.show();
-    this.todoService
-      .update(this.todoId, this.todoForm.value)
-      .subscribe((_) => this.router.navigateByUrl('/todo/list'));
+    this.store
+      .dispatch(new UpdateTodo(this.todoId, this.todoForm.value))
+      .subscribe(() => this.router.navigateByUrl('/todo/list'));
   }
 
   get titleForm() {

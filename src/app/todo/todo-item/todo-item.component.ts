@@ -1,7 +1,9 @@
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
-import { Todo } from '../../models/Todo';
+import { Todo } from '../../models/todo';
 import { Router } from '@angular/router';
-import { TodoService } from '../todo.service';
+import { Store } from '@ngxs/store';
+import { TodoAction } from '../store/todo.actions';
+import DeleteTodo = TodoAction.DeleteTodo;
 
 @Component({
   selector: 'app-todo-item',
@@ -13,7 +15,7 @@ export class TodoItemComponent implements OnInit {
   @Output() event = new EventEmitter<String>();
   categoryColor: string = '';
 
-  constructor(private router: Router, private todoService: TodoService) {
+  constructor(private router: Router, private store: Store) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
@@ -37,6 +39,6 @@ export class TodoItemComponent implements OnInit {
   }
 
   delete(id: number) {
-    this.todoService.delete(id).subscribe((_) => this.event.emit());
+    this.store.dispatch(new DeleteTodo(id)).subscribe(() => this.event.emit());
   }
 }
