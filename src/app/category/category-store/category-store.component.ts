@@ -3,7 +3,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { colorList } from '../../util/color-list';
-import { CategoryService } from '../category.service';
+import { Store } from '@ngxs/store';
+import { CategoryAction } from '../store/category.actions';
+import AddCategory = CategoryAction.AddCategory;
 
 @Component({
   selector: 'app-category-store',
@@ -17,7 +19,7 @@ export class CategoryStoreComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private categoryService: CategoryService
+    private store: Store
   ) {
     this.categoryForm = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -32,8 +34,8 @@ export class CategoryStoreComponent implements OnInit {
   ngOnInit(): void {}
 
   onSubmit(): void {
-    this.categoryService
-      .add(this.categoryForm.value)
+    this.store
+      .dispatch(new AddCategory(this.categoryForm.value))
       .subscribe((_) => this.router.navigateByUrl('/category/list'));
   }
 

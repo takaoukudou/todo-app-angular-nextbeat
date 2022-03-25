@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { handleError } from '../util/handle-error';
 import { Category } from '../models/category';
+import { CategoryFormValue } from '../models/category-form';
 
 @Injectable({
   providedIn: 'root',
@@ -30,21 +31,28 @@ export class CategoryService {
     );
   }
 
-  add(categoryFormValue: any): Observable<any> {
+  add(categoryFormValue: CategoryFormValue): Observable<Category> {
     return this.http
-      .post(this.baseUrl, categoryFormValue, this.httpOptions)
+      .post<Category>(this.baseUrl, categoryFormValue, this.httpOptions)
       .pipe(
         tap(() => console.log('add category')),
-        catchError(handleError('addCategory'))
+        catchError(handleError<Category>('addCategory'))
       );
   }
 
-  update(id: number, categoryFormValue: any): Observable<any> {
+  update(
+    id: number,
+    categoryFormValue: CategoryFormValue
+  ): Observable<Category> {
     return this.http
-      .put(`${this.baseUrl}/${id}`, categoryFormValue, this.httpOptions)
+      .put<Category>(
+        `${this.baseUrl}/${id}`,
+        categoryFormValue,
+        this.httpOptions
+      )
       .pipe(
         tap(() => console.log('update category')),
-        catchError(handleError('updateCategory'))
+        catchError(handleError<Category>('updateCategory'))
       );
   }
 

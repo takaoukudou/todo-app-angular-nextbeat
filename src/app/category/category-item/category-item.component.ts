@@ -8,8 +8,10 @@ import {
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Category } from '../../models/Category';
-import { CategoryService } from '../category.service';
+import { Category } from '../../models/category';
+import { CategoryAction } from '../store/category.actions';
+import DeleteCategory = CategoryAction.DeleteCategory;
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-category-item',
@@ -25,7 +27,7 @@ export class CategoryItemComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     public changeDetectorRef: ChangeDetectorRef,
-    private categoryService: CategoryService
+    private store: Store
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
@@ -50,6 +52,8 @@ export class CategoryItemComponent implements OnInit {
   }
 
   delete(id: number) {
-    this.categoryService.delete(id).subscribe((_) => this.event.emit());
+    this.store
+      .dispatch(new DeleteCategory(id))
+      .subscribe((_) => this.event.emit());
   }
 }

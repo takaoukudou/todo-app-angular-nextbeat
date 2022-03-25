@@ -3,9 +3,14 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingService } from '../../loading/loading.service';
-import { Category } from '../../models/Category';
+import { Category } from '../../models/category';
 import { colorList } from '../../util/color-list';
-import { CategoryService } from '../category.service';
+import { Select, Store } from '@ngxs/store';
+import { CategoryState } from '../store/category.state';
+import { Observable } from 'rxjs';
+import { CategoryAction } from '../store/category.actions';
+import UpdateCategory = CategoryAction.UpdateCategory;
+import GetCategory = CategoryAction.GetCategory;
 
 @Component({
   selector: 'app-category-edit',
@@ -15,7 +20,7 @@ import { CategoryService } from '../category.service';
 export class CategoryEditComponent implements OnInit {
   categoryForm!: FormGroup;
   categoryId: number;
-  category: Category | undefined;
+  @Select(CategoryState.selectedCategory) category$!: Observable<Category>;
   colorList = colorList;
 
   constructor(
@@ -23,7 +28,7 @@ export class CategoryEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private loadingService: LoadingService,
-    private categoryService: CategoryService
+    private store: Store
   ) {
     this.categoryId = route.snapshot.params['id'];
   }
@@ -34,28 +39,29 @@ export class CategoryEditComponent implements OnInit {
 
   getCategory(): void {
     this.loadingService.show();
-    this.categoryService.getCategory(this.categoryId).subscribe((category) => {
-      this.category = category;
-      this.setForm();
-      this.loadingService.hide();
-    });
+    this.store
+      .dispatch(new GetCategory(this.categoryId))
+      .subscribe(() => this.setForm());
+    this.loadingService.hide();
   }
 
   setForm(): void {
-    this.categoryForm = new FormGroup({
-      name: new FormControl(this.category?.name, Validators.required),
-      slug: new FormControl(this.category?.slug, [
-        Validators.required,
-        Validators.pattern('[a-zA-Z0-9]*'),
-      ]),
-      color: new FormControl(this.category?.color, Validators.required),
+    this.category$.subscribe((category) => {
+      this.categoryForm = new FormGroup({
+        name: new FormControl(category?.name, Validators.required),
+        slug: new FormControl(category?.slug, [
+          Validators.required,
+          Validators.pattern('[a-zA-Z0-9]*'),
+        ]),
+        color: new FormControl(category?.color, Validators.required),
+      });
     });
   }
 
   onSubmit(): void {
-    this.categoryService
-      .update(this.categoryId, this.categoryForm.value)
-      .subscribe((_) => this.router.navigateByUrl('/category/list'));
+    this.store
+      .dispatch(new UpdateCategory(this.categoryId, this.categoryForm.value))
+      .subscribe(() => this.router.navigateByUrl('/category/list'));
   }
 
   get nameForm() {
