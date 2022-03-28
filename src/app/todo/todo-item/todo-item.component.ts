@@ -31,7 +31,9 @@ export class TodoItemComponent implements OnInit {
         ? 'category-green'
         : this.todo?.color === 4
         ? 'category-yellow'
-        : 'category-pink';
+        : this.todo?.color === 5
+        ? 'category-pink'
+        : 'category-undefined';
   }
 
   edit(id: number) {

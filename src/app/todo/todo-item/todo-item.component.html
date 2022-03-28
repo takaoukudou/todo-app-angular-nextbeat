@@ -1,4 +1,4 @@
-<mat-card id="todo-item" *ngIf="todo">
+<mat-card class="item" *ngIf="todo">
   <div class="boxContainer">
     <mat-card-title class="box">{{todo.title}}</mat-card-title>
     <mat-icon (click)="edit(todo.id)" class="box pointer edit">edit</mat-icon>

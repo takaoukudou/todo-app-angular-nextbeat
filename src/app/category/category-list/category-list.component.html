@@ -1,1 +1,5 @@
-<p>category-list works!</p>
+<div class="app-component">
+  <div *ngFor="let category of categoryList$ | async">
+    <app-category-item [category]="category" (event)="refresh()" class="list-item"></app-category-item>
+  </div>
+</div>
