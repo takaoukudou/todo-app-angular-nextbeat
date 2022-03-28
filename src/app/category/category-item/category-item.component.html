@@ -1,0 +1,8 @@
+<mat-card class="item category-item" *ngIf="category" [ngClass]="categoryColor">
+  <div class="boxContainer">
+    <mat-card-title class="box">{{category.name}}</mat-card-title>
+    <mat-icon (click)="edit(category.id)" class="box pointer edit">edit</mat-icon>
+    <mat-icon (click)="delete(category.id)" class="box pointer delete">delete</mat-icon>
+  </div>
+  <mat-card-subtitle>{{category.slug}}</mat-card-subtitle>
+</mat-card>

@@ -1,0 +1,40 @@
+<div class="app-component">
+  <form [formGroup]="categoryForm" *ngIf="categoryForm" (ngSubmit)="onSubmit()">
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>カテゴリ名</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <div *ngIf="nameForm.invalid && (nameForm.dirty || nameForm.touched)">
+        <mat-error *ngIf="nameForm.errors?.['required']">
+          カテゴリ名が入力されていません。
+        </mat-error>
+      </div>
+    </dl>
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>スラッグ</mat-label>
+        <input matInput formControlName="slug">
+      </mat-form-field>
+      <div *ngIf="slugForm.invalid && (slugForm.dirty || slugForm.touched)">
+        <mat-error *ngIf="slugForm.errors?.['required']">
+          スラッグが入力されていません。
+        </mat-error>
+        <mat-error *ngIf="slugForm.errors?.['pattern']">
+          英数字で入力してください。
+        </mat-error>
+      </div>
+    </dl>
+    <dl>
+      <mat-form-field appearance="fill">
+        <mat-label>色</mat-label>
+        <mat-select formControlName="color">
+          <mat-option *ngFor="let color of colorList" [value]="color.code">
+            {{ color.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </dl>
+    <button mat-raised-button color="accent" type="submit" [disabled]="!categoryForm.valid">登録</button>
+  </form>
+</div>
